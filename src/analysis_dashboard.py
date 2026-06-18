@@ -11751,6 +11751,7 @@ def _resolve_ai_features(resolve: Any) -> Dict[str, Any]:
         "perform_audio_classification": has(folder, "PerformAudioClassification"),
         "clear_audio_classification": has(folder, "ClearAudioClassification"),
         "analyze_for_intellisearch": has(folder, "AnalyzeForIntellisearch"),
+        "reset_intellisearch_analysis": has(project, "ResetIntellisearchAnalysis"),
         "analyze_for_slate": has(folder, "AnalyzeForSlate"),
         "remove_motion_blur": has(folder, "RemoveMotionBlur"),
     }
@@ -11760,6 +11761,7 @@ def _resolve_ai_features(resolve: Any) -> Dict[str, Any]:
         # Methods that additionally need an Extras download to actually run.
         "requires_extra": {
             "analyze_for_intellisearch": "AI IntelliSearch",
+            "reset_intellisearch_analysis": "AI IntelliSearch",
             "analyze_for_slate": "AI Slate ID",
             "generate_speech": "AI Speech Generator",
         },

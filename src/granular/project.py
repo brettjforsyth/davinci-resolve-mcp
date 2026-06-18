@@ -1652,3 +1652,19 @@ def generate_speech(text_input: str, voice_model: str = "", timecode: str = "",
     if not new_item:
         return {"success": False, "error": "GenerateSpeech returned no media item"}
     return {"success": True, "new": new_item.GetName(), "new_id": new_item.GetUniqueId()}
+
+
+@mcp.tool()
+def reset_intellisearch_analysis() -> Dict[str, Any]:
+    """Clear the current project's IntelliSearch analysis data (Resolve 21+).
+
+    Project-wide reset; the counterpart to analyze_for_intellisearch (which runs
+    on a folder or clip). Requires the AI IntelliSearch Extra. Returns
+    success=True if the reset call succeeded.
+    """
+    pm, current_project = get_current_project()
+    if not current_project:
+        return {"error": "No project currently open"}
+    if not hasattr(current_project, "ResetIntellisearchAnalysis"):
+        return {"error": "ResetIntellisearchAnalysis requires DaVinci Resolve 21+"}
+    return {"success": bool(current_project.ResetIntellisearchAnalysis())}

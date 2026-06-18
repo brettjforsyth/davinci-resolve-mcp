@@ -136,6 +136,7 @@ class MediaPoolStub:
 class Project21:
     def __init__(self):
         self.calls = []
+        self.reset_called = False
 
     def GetName(self):
         return "Proj"
@@ -143,6 +144,10 @@ class Project21:
     def GenerateSpeech(self, settings, timecode):
         self.calls.append((settings, timecode))
         return Clip21(name="speech.wav", cid="vo-1")
+
+    def ResetIntellisearchAnalysis(self):
+        self.reset_called = True
+        return True
 
 
 class LegacyProject:
@@ -355,6 +360,41 @@ class Resolve21GenerateSpeechTest(unittest.TestCase):
     def test_legacy_project_guarded(self):
         compound._check = lambda: (None, LegacyProject(), None)
         out = compound.project_settings("generate_speech", {"speech_generation_settings": {"TextInput": "x"}})
+        self.assertIn("error", out)
+        self.assertIn("21.0", str(out))
+
+
+class Resolve21ResetIntellisearchTest(unittest.TestCase):
+    def setUp(self):
+        self.proj = Project21()
+        self._orig_check = compound._check
+        compound._check = lambda: (None, self.proj, None)
+        self._tmp = tempfile.TemporaryDirectory()
+        self._orig_root = compound._ai_ledger_root
+        compound._ai_ledger_root = lambda: self._tmp.name
+
+    def tearDown(self):
+        compound._check = self._orig_check
+        compound._ai_ledger_root = self._orig_root
+        self._tmp.cleanup()
+
+    def test_reset_runs_and_records_ledger(self):
+        out = compound.project_settings("reset_intellisearch_analysis", {})
+        self.assertTrue(out["success"])
+        self.assertTrue(self.proj.reset_called)
+        rows = _ledger.get_usage(project_root=self._tmp.name, op="reset_intellisearch_analysis")
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["op_class"], "analysis")
+        # Not a media-creating op: no confirm token, no governance gate.
+        self.assertNotIn("status", out)
+
+    def test_unknown_action_lists_reset(self):
+        out = compound.project_settings("bogus", {})
+        self.assertIn("reset_intellisearch_analysis", str(out))
+
+    def test_legacy_project_guarded(self):
+        compound._check = lambda: (None, LegacyProject(), None)
+        out = compound.project_settings("reset_intellisearch_analysis", {})
         self.assertIn("error", out)
         self.assertIn("21.0", str(out))
 

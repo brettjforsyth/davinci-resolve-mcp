@@ -103,8 +103,8 @@ before mutating Resolve state.
 
 | Mode | Entry point | Tool count | Use when |
 |---|---|---|---|
-| Compound (default) | `src/server.py` | 32 tools | Most workflows — keeps context lean |
-| Granular (full) | `src/server.py --full` | 341 tools | Power users needing one tool per API method |
+| Compound (default) | `src/server.py` | 34 tools | Most workflows — keeps context lean |
+| Granular (full) | `src/server.py --full` | 342 tools | Power users needing one tool per API method |
 
 This skill document covers the **compound server** (the default). Each compound
 tool accepts an `action` string and an optional `params` object.
@@ -1611,10 +1611,10 @@ timeline(action="get_items", params={"track_type": "video", "index": 1})
 
 ## API Coverage
 
-All 336 non-deprecated methods of the DaVinci Resolve Scripting API are covered.
-331 methods have been live-tested across Resolve 19.1.3 Studio and Resolve
-20.3.2 Studio. Five methods require infrastructure not available in typical
-setups:
+All 349 non-deprecated methods of the DaVinci Resolve Scripting API are covered.
+343 methods have been live-tested across Resolve 19.1.3 Studio, Resolve
+20.3.2 Studio, and Resolve 21.0.0.47 Studio. Six methods require infrastructure
+or an AI Extra not available in typical setups:
 
 | Method | Requires |
 |---|---|
@@ -1623,5 +1623,6 @@ setups:
 | `ProjectManager.ImportCloudProject` | Resolve cloud infrastructure |
 | `ProjectManager.RestoreCloudProject` | Resolve cloud infrastructure |
 | `Timeline.AnalyzeDolbyVision` | HDR / Dolby Vision content |
+| `Project.ResetIntellisearchAnalysis` | AI IntelliSearch Extra (presence-verified on 21.0.0.47) |
 
 The full API reference is in `docs/reference/resolve_scripting_api.txt`.

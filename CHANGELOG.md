@@ -2,6 +2,42 @@
 
 Release history for the DaVinci Resolve MCP Server. The latest release is summarized in the root README; older entries live here to keep the README focused.
 
+## What's New in v2.57.0
+
+Completes Resolve 21.0 scripting-API coverage and reconciles the docs now that
+Resolve 21.0 has shipped as a stable public release (build 21.0.0.47).
+
+- **Added** `project_settings.reset_intellisearch_analysis` (granular:
+  `reset_intellisearch_analysis`) wrapping `Project.ResetIntellisearchAnalysis()`
+  — the project-wide counterpart to `analyze_for_intellisearch`. Version-guarded
+  to Resolve 21.0 and recorded in the Resolve 21 AI-ops ledger as an `analysis`
+  op (`AI IntelliSearch` Extra). This was the one Resolve 21.0 method still
+  missing — the API surface is now complete at 9/9 of the 21.0 additions. It is
+  the only 21.0 method absent from Blackmagic's bundled `CHANGELOG.txt`
+  (documented in `README.txt` only), which is how it was previously missed.
+- **Documentation** reconciled coverage/reference docs to the shipped Resolve
+  21.0:
+  - Re-vendored `docs/reference/resolve_scripting_api.txt` from the installed
+    Resolve 21.0 README (1129 lines), adding the "Studio and AI Scripting APIs"
+    Extras section and the Motion Deblur / Analyze Slate / Speech Generation
+    settings tables. Clears the `audit_api_parity.py` REVIEW for
+    `ResetIntellisearchAnalysis`.
+  - `docs/reference/api-coverage.md`: removed the stale "Resolve 21 beta APIs are
+    intentionally deferred until stable" note (21.0 shipped, and the additions
+    were already implemented); added Resolve 21.0.0.47 to "Tested Against";
+    recounted methods 336 → 349 (Resolve 23, Project 45, Folder 13,
+    MediaPoolItem 41) and fixed the MediaStorage summary (9 → 7); added the 13
+    Resolve 21 method rows and a Resolve 21 delta test row.
+  - Reconciled the compound tool count to **34** and granular to **342** across
+    `README.md`, `docs/SKILL.md`, and the `src/server.py` / `src/resolve_mcp_server.py`
+    banners (previously variously 32 / 33 / 341).
+  - Regenerated `docs/reference/readwrite-symmetry.md`.
+- **Validation** offline unit/static suite (including the new
+  `Resolve21ResetIntellisearchTest` cases), `audit_api_parity.py`, and the drift
+  guards pass. `Project.ResetIntellisearchAnalysis` was presence-verified live on
+  DaVinci Resolve Studio 21.0.0.47 (read-only `hasattr`); a full execute-test is
+  gated on the AI IntelliSearch Extra.
+
 ## What's New in v2.56.1
 
 Final reliability batch from the exhaustive audit (Wave B + P2/P3 selections).

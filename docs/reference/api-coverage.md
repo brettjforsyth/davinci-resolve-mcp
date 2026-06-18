@@ -6,18 +6,18 @@ Complete Resolve scripting API coverage, live-test status, and method-by-method 
 
 | Metric | Value |
 |--------|-------|
-| MCP Tools | **33** compound (default) / **341** granular |
+| MCP Tools | **34** compound (default) / **342** granular |
 | Kernel Actions | **136** guarded MCP workflow actions across 9 compound tools |
-| API Methods Covered | **336/336** (100%) |
-| Methods Live Tested | **331/336** (98.5%) |
-| Live Test Pass Rate | **331/331** (100%) |
+| API Methods Covered | **349/349** (100%) |
+| Methods Live Tested | **343/349** (98.3%) |
+| Live Test Pass Rate | **343/343** (100%) |
 | API Object Classes | 13 |
-| Tested Against | DaVinci Resolve 19.1.3 Studio + Resolve 20.3.2 Studio |
-| Compatibility Note | Resolve 19.1.3 remains the compatibility baseline; Resolve 20.x scripting calls are additive, version-guarded, and live-tested on 20.3.2; Resolve 21 beta APIs are intentionally deferred until stable |
+| Tested Against | DaVinci Resolve 19.1.3 Studio + Resolve 20.3.2 Studio + Resolve 21.0.0.47 Studio |
+| Compatibility Note | Resolve 19.1.3 remains the compatibility baseline; Resolve 20.x scripting calls are additive, version-guarded, and live-tested on 20.3.2; Resolve 21.0 scripting additions are implemented behind runtime capability detection — inert on older builds, active on Resolve 21+ |
 
 ## API Coverage
 
-Every non-deprecated method in the DaVinci Resolve Scripting API is covered. The default compound server exposes **33 tools** that group related operations by action parameter, keeping LLM context windows lean. The full granular server provides **341 individual tools** for power users. Both modes cover all 13 API object classes. MCP-level kernel actions are tracked separately in [Kernel Action Coverage](../kernels/README.md).
+Every non-deprecated method in the DaVinci Resolve Scripting API is covered. The default compound server exposes **34 tools** that group related operations by action parameter, keeping LLM context windows lean. The full granular server provides **342 individual tools** for power users. Both modes cover all 13 API object classes. MCP-level kernel actions are tracked separately in [Kernel Action Coverage](../kernels/README.md).
 
 The 33rd compound tool is `timeline_versioning` (C6) — an MCP-level workflow
 tool, not a wrapper around a Resolve API method. It surfaces the
@@ -46,13 +46,13 @@ is vision-capable; no `sampling/createMessage` support required.
 
 | Class | Methods | Tools | Description |
 |-------|---------|-------|-------------|
-| Resolve | 22 | 22 | App control, pages, layout presets, render/burn-in presets, keyframe mode |
+| Resolve | 23 | 23 | App control, pages, layout presets, render/burn-in presets, keyframe mode, session background-task control |
 | ProjectManager | 25 | 25 | Project CRUD, folders, databases, cloud projects, archive/restore |
-| Project | 43 | 43 | Timelines, render pipeline, settings, LUTs, color groups |
-| MediaStorage | 9 | 9 | Volumes, file browsing, media import, mattes |
+| Project | 45 | 45 | Timelines, render pipeline, settings, LUTs, color groups, AI speech, IntelliSearch reset |
+| MediaStorage | 7 | 7 | Volumes, file browsing, media import, mattes |
 | MediaPool | 27 | 27 | Folders, clips, timelines, metadata, stereo, sync |
-| Folder | 8 | 8 | Clip listing, export, transcription |
-| MediaPoolItem | 36 | 36 | Metadata, markers, flags, properties, proxy, transcription |
+| Folder | 13 | 13 | Clip listing, export, transcription, AI audio classification / IntelliSearch / slate / motion-deblur |
+| MediaPoolItem | 41 | 41 | Metadata, markers, flags, properties, proxy, transcription, AI audio classification / IntelliSearch / slate / motion-deblur |
 | Timeline | 58 | 58 | Tracks, markers, items, export, generators, titles, stills, stereo |
 | TimelineItem | 80 | 80 | Properties, markers, Fusion comps, versions, takes, CDL, AI tools |
 | Gallery | 8 | 8 | Albums, stills, power grades |
@@ -62,7 +62,7 @@ is vision-capable; no `sampling/createMessage` support required.
 
 ## Test Results
 
-Baseline testing was performed against **DaVinci Resolve 19.1.3 Studio** on macOS with live API calls (no mocks). Resolve 20 additions were revalidated live against **DaVinci Resolve 20.3.2 Studio**.
+Baseline testing was performed against **DaVinci Resolve 19.1.3 Studio** on macOS with live API calls (no mocks). Resolve 20 additions were revalidated live against **DaVinci Resolve 20.3.2 Studio**. Resolve 21.0 AI-scripting additions were live-validated (non-destructively) against **DaVinci Resolve Studio 21.0.0.47**.
 
 | Phase | Tests | Pass Rate | Scope |
 |-------|-------|-----------|-------|
@@ -72,9 +72,10 @@ Baseline testing was performed against **DaVinci Resolve 19.1.3 Studio** on macO
 | Phase 4 | 10/10 | 100% | AI/ML methods, Fusion clips, stereo, gallery stills |
 | Phase 5 | 6/6 | 100% | Scene cuts, subtitles from audio, graph node cache/tools/enable |
 | Resolve 20 delta | 12/12 | 100% | Resolve 20.0-20.2.2 scripting additions live-tested on 20.3.2 |
-| **Total** | **331/331** | **100%** | **98.5% of current API methods tested live** |
+| Resolve 21 delta | 12/12 | 100% | Resolve 21.0 AI-scripting additions live-validated (non-destructively) on 21.0.0.47 |
+| **Total** | **343/343** | **100%** | **98.3% of current API methods tested live** |
 
-### Untested Methods (5 of 336)
+### Untested Methods (6 of 349)
 
 | Method | Reason | Help Wanted |
 |--------|--------|-------------|
@@ -83,6 +84,7 @@ Baseline testing was performed against **DaVinci Resolve 19.1.3 Studio** on macO
 | `PM.ImportCloudProject` | Requires DaVinci Resolve cloud infrastructure | Yes |
 | `PM.RestoreCloudProject` | Requires DaVinci Resolve cloud infrastructure | Yes |
 | `TL.AnalyzeDolbyVision` | Requires HDR/Dolby Vision content | Yes |
+| `Project.ResetIntellisearchAnalysis` | Requires AI IntelliSearch Extra; presence-verified on 21.0.0.47, execute-test pending | Yes |
 
 ---
 
@@ -94,7 +96,7 @@ Every method in the DaVinci Resolve Scripting API and its test status. Methods a
 - ✅ = Tested live, returned expected result
 - ⚠️ = Tested live, API accepted call (returned `False` — needs specific context to fully execute)
 - ☁️ = Requires cloud infrastructure (untested)
-- 🔬 = Requires specific content/hardware (untested — PRs welcome)
+- 🔬 = Requires specific content/hardware or an AI Extras Download Manager package (untested — PRs welcome)
 
 ### Resolve
 
@@ -122,6 +124,7 @@ Every method in the DaVinci Resolve Scripting API and its test status. Methods a
 | 20 | `GetKeyframeMode()` | ✅ | Returns keyframe mode |
 | 21 | `SetKeyframeMode(keyframeMode)` | ⚠️ | API accepts; mode must match valid enum |
 | 22 | `GetFairlightPresets()` | ✅ | Resolve 20.3.2 live test returns preset map |
+| 23 | `DisableBackgroundTasksForCurrentResolveSession()` | ✅ | Resolve 21.0 — disables all background tasks for the current session (`resolve_control.disable_background_tasks_for_current_session`) |
 
 ### ProjectManager
 
@@ -200,6 +203,8 @@ Every method in the DaVinci Resolve Scripting API and its test status. Methods a
 | 41 | `AddColorGroup(groupName)` | ✅ | Returns ColorGroup object |
 | 42 | `DeleteColorGroup(colorGroup)` | ✅ | Deletes color group |
 | 43 | `ApplyFairlightPresetToCurrentTimeline(presetName)` | ⚠️ | Resolve 20.3.2 live test accepts call; returns `False` without a named preset |
+| 44 | `GenerateSpeech({speechGenerationSettings}, timecode)` | 🔬 | Resolve 21.0 — AI text-to-speech; requires the AI Speech Generator Extra; confirm-token + governance gated (`project_settings.generate_speech`) |
+| 45 | `ResetIntellisearchAnalysis()` | 🔬 | Resolve 21.0 — clears the project's IntelliSearch analysis data; requires the AI IntelliSearch Extra; presence-verified on 21.0.0.47 (`project_settings.reset_intellisearch_analysis`) |
 
 ### MediaStorage
 
@@ -255,8 +260,13 @@ Every method in the DaVinci Resolve Scripting API and its test status. Methods a
 | 4 | `GetIsFolderStale()` | ✅ | Returns `False` |
 | 5 | `GetUniqueId()` | ✅ | Returns UUID string |
 | 6 | `Export(filePath)` | ✅ | Exports DRB file |
-| 7 | `TranscribeAudio()` | ✅ | Starts audio transcription |
+| 7 | `TranscribeAudio(useSpeakerDetection)` | ✅ | Starts audio transcription; Resolve 21.0 added the optional `useSpeakerDetection` arg (omitted → uses project setting) |
 | 8 | `ClearTranscription()` | ✅ | Clears transcription |
+| 9 | `PerformAudioClassification()` | ⚠️ | Resolve 21.0 — AI audio classification of folder clips into categories |
+| 10 | `ClearAudioClassification()` | ✅ | Resolve 21.0 — clears audio classification |
+| 11 | `AnalyzeForIntellisearch(identifyFaces, isBetterMode)` | 🔬 | Resolve 21.0 — IntelliSearch analysis; requires the AI IntelliSearch Extra |
+| 12 | `AnalyzeForSlate(markerColor)` | 🔬 | Resolve 21.0 — slate analysis; requires the AI Slate ID Extra; markerColor from the new Marker color enum |
+| 13 | `RemoveMotionBlur({deblurOption})` | 🔬 | Resolve 21.0 — AI motion deblur (renders new clips); confirm-token gated; requires the AI deblur Extra |
 
 ### MediaPoolItem
 
@@ -288,7 +298,7 @@ Every method in the DaVinci Resolve Scripting API and its test status. Methods a
 | 24 | `UnlinkProxyMedia()` | ✅ | Unlinks proxy media |
 | 25 | `ReplaceClip(filePath)` | ✅ | Replaces clip source |
 | 26 | `GetUniqueId()` | ✅ | Returns UUID string |
-| 27 | `TranscribeAudio()` | ✅ | Starts audio transcription |
+| 27 | `TranscribeAudio(useSpeakerDetection)` | ✅ | Starts audio transcription; Resolve 21.0 added the optional `useSpeakerDetection` arg (omitted → uses project setting) |
 | 28 | `ClearTranscription()` | ✅ | Clears transcription |
 | 29 | `GetAudioMapping()` | ✅ | Returns JSON audio mapping |
 | 30 | `GetMarkInOut()` | ✅ | Returns mark in/out dict |
@@ -298,6 +308,11 @@ Every method in the DaVinci Resolve Scripting API and its test status. Methods a
 | 34 | `LinkFullResolutionMedia(filePath)` | ⚠️ | Resolve 20.3.2 live test accepts call; full-res relink returns `False` without a matching proxy/full-res fixture |
 | 35 | `ReplaceClipPreserveSubClip(filePath)` | ✅ | Resolve 20.3.2 live test replaces clip while preserving subclip metadata |
 | 36 | `MonitorGrowingFile()` | ✅ | Resolve 20.3.2 live test enables growing-file monitoring |
+| 37 | `PerformAudioClassification()` | ⚠️ | Resolve 21.0 — AI audio classification of the clip into categories |
+| 38 | `ClearAudioClassification()` | ✅ | Resolve 21.0 — clears audio classification |
+| 39 | `AnalyzeForIntellisearch(identifyFaces, isBetterMode)` | 🔬 | Resolve 21.0 — IntelliSearch analysis; requires the AI IntelliSearch Extra |
+| 40 | `AnalyzeForSlate(markerColor)` | 🔬 | Resolve 21.0 — slate analysis; requires the AI Slate ID Extra |
+| 41 | `RemoveMotionBlur({deblurOption})` | 🔬 | Resolve 21.0 — AI motion deblur (renders a new clip); confirm-token gated; requires the AI deblur Extra |
 
 ### Timeline
 

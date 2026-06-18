@@ -2,16 +2,16 @@
 """
 DaVinci Resolve MCP Server (Compound Tools)
 
-32 compound tools covering 100% of the DaVinci Resolve Scripting API (336 methods)
+34 compound tools covering 100% of the DaVinci Resolve Scripting API (349 methods)
 plus Fusion Fuse, DCTL, and Resolve-page Script authoring tools.
 Each tool groups related operations via an 'action' parameter.
 
 Usage:
     python src/server.py              # Start the MCP server
-    python src/server.py --full       # Start the 341-tool granular server instead
+    python src/server.py --full       # Start the 342-tool granular server instead
 """
 
-VERSION = "2.56.1"
+VERSION = "2.57.0"
 
 import base64
 import os
@@ -285,7 +285,7 @@ def davinci_resolve_workflow() -> str:
     return """Use this DaVinci Resolve MCP server as a guarded post-production control surface.
 
 Core pattern:
-- Prefer the 32 compound tools and their action names over raw scripting.
+- Prefer the 34 compound tools and their action names over raw scripting.
 - Start by probing state: resolve_control.get_version/get_page, project_manager.get_current, timeline.get_current, and media_pool.probe_media_pool.
 - Before mutating timelines, media pools, render settings, grades, projects, databases, or extensions, prefer the matching probe, capabilities, boundary_report, safe_*, or dry_run action when one exists.
 - Preserve source media integrity. Never transcode, proxy, rewrite, move, rename, or create derivatives of source media unless the user explicitly asks. Analysis output belongs in sidecars or analysis directories.
@@ -14297,7 +14297,15 @@ def project_settings(action: str, params: Optional[Dict[str, Any]] = None) -> Di
             return {"success": False}
         return {"success": True, "new": new_item.GetName(), "new_id": new_item.GetUniqueId(),
                 "output_path": _rec.output_path, "output_bytes": _rec.output_bytes}
-    return _unknown(action, ["get_name","set_name","get_setting","set_setting","get_unique_id","get_presets","set_preset","refresh_luts","get_gallery","export_frame_as_still","project_summary","load_burnin_preset","insert_audio","get_color_groups","add_color_group","delete_color_group","apply_fairlight_preset","generate_speech"])
+    elif action == "reset_intellisearch_analysis":
+        missing = _requires_method(proj, "ResetIntellisearchAnalysis", "21.0")
+        if missing:
+            return missing
+        with _ai_ledger_timed("reset_intellisearch_analysis") as _rec:
+            ok = bool(proj.ResetIntellisearchAnalysis())
+            _rec.success = ok
+        return {"success": ok}
+    return _unknown(action, ["get_name","set_name","get_setting","set_setting","get_unique_id","get_presets","set_preset","refresh_luts","get_gallery","export_frame_as_still","project_summary","load_burnin_preset","insert_audio","get_color_groups","add_color_group","delete_color_group","apply_fairlight_preset","generate_speech","reset_intellisearch_analysis"])
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -23742,9 +23750,9 @@ def _resource_install_guidance() -> Dict[str, Any]:
 if __name__ == "__main__":
     start_background_update_check(VERSION, project_dir, logger, env=_setup_update_env())
 
-    # Support --full flag to run the 341-tool granular server instead
+    # Support --full flag to run the 342-tool granular server instead
     if "--full" in sys.argv:
-        logger.info("Starting full 341-tool granular server...")
+        logger.info("Starting full 342-tool granular server...")
         sys.argv = [arg for arg in sys.argv if arg != "--full"]
         from src.granular import mcp as granular_mcp
 
@@ -23769,5 +23777,5 @@ if __name__ == "__main__":
         logger.error(f"Unknown --transport {transport!r}; use stdio|sse|streamable-http")
         sys.exit(2)
 
-    logger.info(f"Starting DaVinci Resolve MCP Server (32 compound tools)")
+    logger.info(f"Starting DaVinci Resolve MCP Server (34 compound tools)")
     run_fastmcp_stdio(mcp)
